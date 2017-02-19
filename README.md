@@ -133,6 +133,7 @@
     # emerge --ask net-misc/dhcpcd
         
 Смена пароля root:
+
     # passwd
     
 Установка загрузчика:
@@ -187,7 +188,7 @@
 
 ### Добавление нового пользователя
 
-    # useradd -m -G users,wheel,audio,video,sudo -s /bin/bash <name>
+    # useradd -m -G users,wheel,audio,video,sudo -s /bin/bash <user>
 
 ### Настройка sudo
 
@@ -211,7 +212,7 @@
 
 Добавить нужно пользователя в группу `sudo`:
 
-    # usermod -a -G sudo creative
+    # usermod -a -G sudo <user>
 
 Для включения логирования необходимо запустить редактор
 
