@@ -186,6 +186,12 @@
 
     $ sudo systemctl restart alsa-restore
 
+### Настройка USB-наушников
+
+Список всех звуковых карт:
+
+    $ cat /proc/asound/cards
+
 ### Добавление нового пользователя
 
     # useradd -m -G users,wheel,audio,video,sudo -s /bin/bash <user>
@@ -296,15 +302,21 @@
 
 Подключение драйвера X (не сработало):
 
-    $ nano -w /etc/X11/xorg.conf.d/10radeon.conf
-
-Этот файл должен иметь следующее содержание (не сработало):
-
-    Section "Device"
-        Identifier  "radeon"
-        Driver      "radeon"
-    EndSection
+    $ nano -w /etc/X11/xorg.conf.d/10-radeon.conf
+    
+        Section "Device"
+            Identifier  "radeon"
+            Driver      "radeon"
+        EndSection
 
 Проверка наличия аппаратного 3D-ускорения:
 
     $ glxinfo | grep -i rendering
+
+### Тормозит KDE
+
+Установить параметр:
+
+    System Settings -> Display and Monitor -> Compositor
+        Rendering backend -> XRender
+    
