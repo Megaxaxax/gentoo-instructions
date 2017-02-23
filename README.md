@@ -194,7 +194,13 @@
 
 ### Добавление нового пользователя
 
+Добавление пользователя:
+
     # useradd -m -G users,wheel,audio,video,sudo -s /bin/bash <user>
+    # passwd <user>
+    
+> При использовании `ConsoleKit/Systemd/Logind` группу `audio` указывать не
+нужно.
 
 ### Настройка sudo
 
@@ -319,4 +325,31 @@
 
     System Settings -> Display and Monitor -> Compositor
         Rendering backend -> XRender
-    
+
+### Установка PulseAudio
+
+Установка пакета:
+
+    $ sudo vim /etc/portage/make.conf
+        
+        USE="pulseaudio"
+        
+    $ sudo emerge --ask --changed-use --deep @world
+
+В документации сказано, что при использовании `ConsoleKit/Systemd/Logind` в
+группе `audio` не должно быть ни одного пользователя. Всех пользователей
+необходимо удалить из группы `audio`:
+
+    $ sudo gpasswd -d <user> audio
+
+### Сборка ядра
+
+    $ sudo make menuconfig
+    $ sudo make
+    $ sudo modules_install
+    $ sudo make install
+
+### Не работают наушники Plantronics
+
+    CONFIG_USB_EHCI_ROOT_HUB_TT=m
+    CONFIG_USB_EHCI_TT_NEWSCHED=m
