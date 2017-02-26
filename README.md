@@ -364,3 +364,22 @@
     $ sudo emerge -pv --depclean
     $ sudo emerge --depclean
 
+### Монтирование файловых систем без root-прав
+
+Создать файл с правилами:
+
+    $ sudo touch /etc/polkit-1/rules.d/10-udisks.rules
+    
+Добавить в этот файл правило (`USER` заменить на имя пользователя):
+
+    polkit.addRule(function(action, subject)
+    {
+        if ((action.id == "org.freedesktop.udisks2.filesystem-mount" ||
+            action.id == "org.freedesktop.udisks2.filesystem-mount-system") &&
+            subject.user == "USER")
+        {
+            return polkit.Result.YES;
+            }
+    });
+
+Перезапуск сервиса `polkit` не требуется.
