@@ -353,3 +353,14 @@
 
     CONFIG_USB_EHCI_ROOT_HUB_TT=m
     CONFIG_USB_EHCI_TT_NEWSCHED=m
+
+### Обновление операционной системы
+
+    $ sudo emerge --ask app-portage/gentoolkit
+    $ sudo emerge --sync
+    $ sudo emerge -pvuND --with-bdeps=y @world
+    $ sudo emerge -uND @world
+    $ sudo revdep-rebuild [python-updater/haskell-updater/perl-cleaner]
+    $ sudo emerge -pv --depclean
+    $ sudo emerge --depclean
+
