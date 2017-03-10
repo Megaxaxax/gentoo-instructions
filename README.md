@@ -293,6 +293,8 @@
     # eselect opengl list
     # eselect opengl set N
 
+Возможно может пригодится следующий пакет: `x11-drivers/xf86-video-amdgpu`.
+
 Проверка наличия устройства:
 
     # lspci | grep VGA
@@ -342,6 +344,12 @@
 
     $ sudo gpasswd -d <user> audio
 
+После установки `pulseaudio` в трее появится `Audio Volume Control`, который
+удобнее, чем `kmix`. Удаление `kmix`:
+
+    $ sudo emerge -pvC kmix
+    $ sudo emerge -C kmix
+
 ### Сборка ядра
 
     $ sudo make menuconfig
@@ -359,7 +367,7 @@
     $ sudo emerge --ask app-portage/gentoolkit
     $ sudo emerge --sync
     $ sudo emerge -pvuND --with-bdeps=y @world
-    $ sudo emerge -uND @world
+    $ sudo emerge -uND --with-bdeps=y @world
     $ sudo revdep-rebuild [python-updater/haskell-updater/perl-cleaner]
     $ sudo emerge -pv --depclean
     $ sudo emerge --depclean
@@ -379,7 +387,85 @@
             subject.user == "USER")
         {
             return polkit.Result.YES;
-            }
+        }
     });
 
 Перезапуск сервиса `polkit` не требуется.
+
+Изменение, приведенные выше позволяют монтировать файловые системы без
+root-прав, но для того, чтобы иметь возможность изменять содержимое
+смонтированных разделов, необходимо сменить права для директории монтирования,
+если раздел отформатирован в современной файловой системе (ext и др.):
+
+    $ sudo chown root:disk /run/media/<user>/<mount-point>
+    $ sudo chmod g+w /run/media/<user>/<mount-point>
+    
+Для монтирования `ntfs` устройств с правами на запись необходимо установить
+пакет:
+
+    $ sudo emerge --ask sys-fs/ntfs3g
+    
+# Работа с ACL
+
+Сначала проверить включен ли ACL:
+
+    $ ls -lh /run/media/<user>
+
+Если в строке с правами доступа фигурирует символ `+`, то ACL включен и права
+настраиваются через него.
+
+Проверка настройки ACL:
+
+    $ getfacl /run/media/<user>
+    
+To add username to have read, write and execute on `/testfiles`:
+
+    # setfacl -m u:username:rwx /testfiles
+
+To add username to have +write access on /testfiles:
+
+    # setfacl -m u:username:+w /testfiles
+
+To add default user access right to read and write on testfolder folder:
+
+    # setfacl -m d:u:username:rw testfolder/
+
+To add groupname to have read, write and execute on /testfiles:
+
+    # setfacl -m g:groupname:rwx /testfiles
+
+To add groupname to have recursive +execute on testfolder:
+
+    # setfacl -R -m g:groupname:+x testfolder/
+
+To add default group access right to read and write on testfolder folder
+
+    # setfacl -m d:g:groupname:rw testfolder/
+    
+# Работа с udev
+
+Добавление нового правила:
+
+    $ cd /etc/udev/rules.d
+    $ sudo touch 10-usb-mounts.rules
+    $ sudo vim 10-usb-mounts.rules
+
+Всю необходимую информацию можно получить следующей командой:
+
+    $ sudo udevadm info -a -p $(udevadm info -q path -n /dev/<device>)
+    
+Пример строки с настройкой прав доступа:
+
+    KERNEL=="sd[a-z]*", SUBSYSTEM=="block", SUBSYSTEMS=="block", GROUP="<group>", MODE="0660"
+
+Если правила не применились автоматически, то можно выполнить команду:
+
+    $ sudo udevadm control --reload
+
+Для принудительного применения правил можно воспользоваться командой:
+
+    $ sudo udevadm trigger
+
+Список примененных к устройству правил:
+
+    $ sudo udevadm test $(udevadm info -q path -n /dev/<device>)
