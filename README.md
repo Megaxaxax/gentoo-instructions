@@ -345,10 +345,12 @@
     $ sudo gpasswd -d <user> audio
 
 После установки `pulseaudio` в трее появится `Audio Volume Control`, который
-удобнее, чем `kmix`. Удаление `kmix`:
+удобнее, чем `kmix`. Удаление `kmix` не поможет, если был установлен `meta`
+пакет, в который входит kmix. Для выключения `kmix` необходимо зайти в
 
-    $ sudo emerge -pvC kmix
-    $ sudo emerge -C kmix
+    System Settings -> Startup and Shutdown -> Background Services
+    
+и в разделе `Startup Services` убрать `KMixD`.
 
 ### Сборка ядра
 
